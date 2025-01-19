@@ -67,7 +67,9 @@ The application supports optional password protection:
    - Visitors can access the application directly
    - Suitable for public access scenarios
 
-## Local Development
+## Deployment Options
+
+### Local Development
 
 ```bash
 npm run dev
@@ -75,13 +77,53 @@ npm run dev
 
 The application will be available at `http://localhost:3000`
 
-## Vercel Deployment
+### Docker Deployment
+
+You can run this application using Docker in two ways:
+
+1. **Pull from Docker Hub**:
+```bash
+docker pull your-username/nexttdl
+docker run -d -p 3000:3000 \
+  -e REDIS_URL=your_redis_url \
+  -e CODE=your_access_code \
+  your-username/nexttdl
+```
+
+2. **Build Locally**:
+```bash
+docker build -t nexttdl .
+docker run -d -p 3000:3000 \
+  -e REDIS_URL=your_redis_url \
+  -e CODE=your_access_code \
+  nexttdl
+```
+
+### Vercel Deployment
 
 1. Import this project to [Vercel](https://vercel.com)
 2. Add environment variables in project settings:
    - `REDIS_URL`: Redis connection string
    - `CODE`: Access password (optional)
 3. Deploy and access your application
+
+## CI/CD
+
+This project includes automated Docker image builds using GitHub Actions:
+
+1. **Automatic Builds**: 
+   - Triggers on pushes to `main` branch
+   - Triggers on new version tags (v*.*.*)
+   - Builds and tests on pull requests
+
+2. **Docker Tags**:
+   - Latest: Most recent build from main
+   - Version tags: Releases (e.g., v1.0.0)
+   - SHA tags: Commit specific builds
+
+3. **Setup Required**:
+   - Add `DOCKERHUB_USERNAME` to GitHub repository secrets
+   - Add `DOCKERHUB_TOKEN` to GitHub repository secrets
 
 ## Features
 
@@ -94,6 +136,8 @@ The application will be available at `http://localhost:3000`
 - Task deadline and progress tracking
 - Optional password protection
 - Elegant login interface
+- Docker support with automated builds
+- CI/CD with GitHub Actions
 
 ## Tech Stack
 
@@ -102,6 +146,8 @@ The application will be available at `http://localhost:3000`
 - Tailwind CSS
 - TypeScript
 - Vercel
+- Docker
+- GitHub Actions
 
 ## License
 
