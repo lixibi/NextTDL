@@ -12,14 +12,6 @@ const nextConfig: NextConfig = {
   
   // 优化构建输出
   compress: true,
-  
-  // 实验性功能
-  experimental: {
-    // 优化资源加载
-    optimizeCss: true,
-    // 优化字节大小
-    optimizePackageImports: ['@heroicons/react', 'framer-motion'],
-  },
 };
 
 export default nextConfig;
