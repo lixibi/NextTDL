@@ -5,16 +5,45 @@ import { PlusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Toaster } from 'react-hot-toast';
 import TodoCard from '@/components/TodoCard';
 import AddTodoModal from '@/components/AddTodoModal';
+import LoginModal from '@/components/LoginModal';
 import { api, Todo } from '@/utils/api';
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    loadTodos();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: '' }),
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(true);
+        loadTodos();
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+    loadTodos();
+  };
 
   const loadTodos = async () => {
     try {
@@ -64,6 +93,18 @@ export default function Home() {
     await loadTodos();
     setIsAddModalOpen(false);
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginModal isOpen={true} onSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <main className="min-h-screen bg-white p-4 sm:p-6 md:p-8">

@@ -14,7 +14,7 @@
 
 ## 数据库设置
 
-1. 在 [Upstash]或者 Vercel (https://upstash.com/) 创建一个新的 Redis 数据库
+1. 在 [Upstash](https://upstash.com/) 创建一个新的 Redis 数据库
 2. 在 Upstash 控制面板中可以找到两种连接格式：
 
    **Redis 连接字符串（用于应用程序）：**
@@ -42,10 +42,28 @@ npm install
 cp .env.example .env.local
 ```
 
-4. 在 `.env.local` 文件中设置 Upstash Redis 连接 URL：
+4. 在 `.env.local` 文件中设置环境变量：
 ```env
+# Redis 连接 URL（必需）
 REDIS_URL=你的_UPSTASH_REDIS_URL
+
+# 访问密码（可选）
+CODE=你的访问密码
 ```
+
+## 访问控制
+
+应用支持可选的密码访问控制：
+
+1. **启用密码保护**：
+   - 在环境变量中设置 `CODE` 变量
+   - 访问者需要输入正确的密码才能访问应用
+   - 适用于需要私密访问的场景
+
+2. **不启用密码保护**：
+   - 不设置 `CODE` 变量
+   - 访问者可以直接访问应用
+   - 适用于公开访问的场景
 
 ## 本地运行
 
@@ -58,7 +76,9 @@ npm run dev
 ## Vercel 部署
 
 1. 在 [Vercel](https://vercel.com) 导入此项目
-2. 在项目设置中添加环境变量 `REDIS_URL`
+2. 在项目设置中添加环境变量：
+   - `REDIS_URL`：Redis 连接字符串
+   - `CODE`：访问密码（可选）
 3. 部署完成后即可访问
 
 ## 功能特性
@@ -70,6 +90,8 @@ npm run dev
 - 简单直观的界面
 - 实时任务状态更新
 - 任务截止时间和进度显示
+- 可选的密码访问保护
+- 优雅的登录界面
 
 ## 技术栈
 

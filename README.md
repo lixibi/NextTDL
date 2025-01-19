@@ -44,10 +44,28 @@ npm install
 cp .env.example .env.local
 ```
 
-4. Update the `.env.local` file with your Upstash Redis URL:
+4. Update the `.env.local` file with your environment variables:
 ```env
+# Redis Connection URL (required)
 REDIS_URL=your_upstash_redis_url
+
+# Access Password (optional)
+CODE=your_access_password
 ```
+
+## Access Control
+
+The application supports optional password protection:
+
+1. **Enable Password Protection**:
+   - Set the `CODE` environment variable
+   - Visitors must enter the correct password to access the application
+   - Suitable for private access scenarios
+
+2. **Disable Password Protection**:
+   - Don't set the `CODE` variable
+   - Visitors can access the application directly
+   - Suitable for public access scenarios
 
 ## Local Development
 
@@ -60,7 +78,9 @@ The application will be available at `http://localhost:3000`
 ## Vercel Deployment
 
 1. Import this project to [Vercel](https://vercel.com)
-2. Add `REDIS_URL` environment variable in project settings
+2. Add environment variables in project settings:
+   - `REDIS_URL`: Redis connection string
+   - `CODE`: Access password (optional)
 3. Deploy and access your application
 
 ## Features
@@ -72,6 +92,8 @@ The application will be available at `http://localhost:3000`
 - Simple and intuitive interface
 - Real-time task status updates
 - Task deadline and progress tracking
+- Optional password protection
+- Elegant login interface
 
 ## Tech Stack
 
