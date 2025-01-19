@@ -7,11 +7,23 @@ if (!REDIS_URL) {
   throw new Error('REDIS_URL environment variable is not defined');
 }
 
-const client = createClient({
-  url: REDIS_URL
-});
+// 创建 Redis 客户端单例
+let client: ReturnType<typeof createClient> | null = null;
 
-client.on('error', (error: Error) => console.error('Redis Client Error', error));
+async function getClient() {
+  if (!client) {
+    client = createClient({
+      url: REDIS_URL,
+      socket: {
+        reconnectStrategy: (retries) => Math.min(retries * 50, 1000),
+      },
+    });
+
+    client.on('error', (error: Error) => console.error('Redis Client Error', error));
+    await client.connect();
+  }
+  return client;
+}
 
 interface Todo {
   id: string;
@@ -25,12 +37,12 @@ interface Todo {
 // GET /api/todos
 export async function GET() {
   try {
-    await client.connect();
-    const keys = await client.keys('hebeos:notes:*');
+    const redis = await getClient();
+    const keys = await redis.keys('hebeos:notes:*');
     
     const todos = await Promise.all(
       keys.map(async (key: string) => {
-        const data = await client.get(key);
+        const data = await redis.get(key);
         if (!data) return null;
         
         const todo = JSON.parse(data);
@@ -42,8 +54,6 @@ export async function GET() {
         };
       })
     );
-    
-    await client.disconnect();
     
     return NextResponse.json(
       todos.filter((todo): todo is Todo => 
@@ -69,12 +79,11 @@ export async function POST(request: Request) {
       created_at: id,
     };
     
-    await client.connect();
-    await client.set(
+    const redis = await getClient();
+    await redis.set(
       `hebeos:notes:${id}`,
       JSON.stringify(todoData)
     );
-    await client.disconnect();
     
     return NextResponse.json(todoData);
   } catch (error) {
@@ -88,10 +97,9 @@ export async function PUT(request: Request) {
   try {
     const { id, ...updates } = await request.json();
     
-    await client.connect();
-    const data = await client.get(`hebeos:notes:${id}`);
+    const redis = await getClient();
+    const data = await redis.get(`hebeos:notes:${id}`);
     if (!data) {
-      await client.disconnect();
       return NextResponse.json({ error: 'Todo not found' }, { status: 404 });
     }
     
@@ -102,11 +110,10 @@ export async function PUT(request: Request) {
       id,
     };
     
-    await client.set(
+    await redis.set(
       `hebeos:notes:${id}`,
       JSON.stringify(updatedTodo)
     );
-    await client.disconnect();
     
     return NextResponse.json(updatedTodo);
   } catch (error) {
@@ -120,9 +127,8 @@ export async function DELETE(request: Request) {
   try {
     const { id } = await request.json();
     
-    await client.connect();
-    await client.del(`hebeos:notes:${id}`);
-    await client.disconnect();
+    const redis = await getClient();
+    await redis.del(`hebeos:notes:${id}`);
     
     return NextResponse.json({ success: true });
   } catch (error) {

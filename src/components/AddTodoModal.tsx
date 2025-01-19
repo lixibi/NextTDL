@@ -1,10 +1,14 @@
 import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import toast from 'react-hot-toast';
 import { api } from '@/utils/api';
+import { zhCN } from 'date-fns/locale';
+
+// 注册中文语言包
+registerLocale('zh-CN', zhCN);
 
 interface AddTodoModalProps {
   isOpen: boolean;
@@ -127,7 +131,11 @@ export default function AddTodoModal({ isOpen, onClose, onAdd }: AddTodoModalPro
                         }
                       }}
                       showTimeSelect
-                      dateFormat="yyyy-MM-dd HH:mm"
+                      locale="zh-CN"
+                      timeFormat="HH:mm"
+                      timeIntervals={15}
+                      dateFormat="yyyy年MM月dd日 HH:mm"
+                      timeCaption="时间"
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
                     />
                   </div>
