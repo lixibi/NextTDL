@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { PlusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Toaster } from 'react-hot-toast';
 import TodoCard from '@/components/TodoCard';
@@ -15,11 +15,7 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch('/api/auth', {
         method: 'POST',
@@ -38,7 +34,11 @@ export default function Home() {
     } finally {
       setIsCheckingAuth(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
